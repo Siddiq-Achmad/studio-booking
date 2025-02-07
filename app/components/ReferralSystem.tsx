@@ -22,7 +22,7 @@ const ReferralSystem = () => {
   const generateReferralCode = () => {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     setReferralCode(code);
-    const link = `https://luxima-studio.com/ref/${code}`;
+    const link = `https://studio.luxima.id/ref/${code}`;
     setReferralLink(link);
   };
 
@@ -82,6 +82,8 @@ const ReferralSystem = () => {
                   <h3 className="font-semibold mb-1">QR Code:</h3>
                   <Image
                     src={qrCodeDataURL || "/placeholder.svg"}
+                    width={200}
+                    height={200}
                     alt="Referral QR Code"
                     className="mx-auto mb-2"
                   />

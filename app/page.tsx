@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <div className="container mx-auto px-6 py-12">
       <AnimatedHero />
-      <section className="text-center mb-12 h-[20vh] flex flex-col justify-center">
+      <section className="text-center mb-12 h-[20vh] flex flex-col justify-center my-8">
         <h1 className="text-4xl font-bold text-foreground mb-4">
           Welcome to LUXIMA Studio
         </h1>
@@ -28,6 +28,7 @@ export default function Home() {
           <Image
             src="https://luxima.id/images/SQA03332.jpg"
             alt="Studio sample"
+            fill
             className="object-cover rounded-lg shadow-lg w-full h-full"
           />
         </div>

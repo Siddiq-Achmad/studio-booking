@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,45 +10,34 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: "", password: "" });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        toast({
-          title: "Login Successful",
-          description: "You have been successfully logged in.",
-        });
-        router.push("/"); // Redirect to home page or dashboard
-      } else {
-        toast({
-          title: "Login Failed",
-          description: data.error,
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Login Failed",
-        description: "An error occurred. Please try again.",
-        variant: "destructive",
-      });
+    setLoading(true);
+
+    const res = await signIn("credentials", {
+      email: formData.email,
+      password: formData.password,
+      redirect: false,
+    });
+
+    setLoading(false);
+
+    if (res?.error) {
+      toast.error("Login gagal. Periksa email dan password.");
+    } else {
+      toast.success("Login berhasil!");
+      router.push("/dashboard");
     }
   };
 
@@ -61,37 +51,39 @@ export default function LoginForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+          <div className="space-y-4">
             <Label htmlFor="email">Email</Label>
             <Input
-              id="email"
               type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
               required
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-4">
             <Label htmlFor="password">Password</Label>
             <Input
-              id="password"
               type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
               required
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
             />
           </div>
-          <Button type="submit" className="w-full">
-            Login
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Loading..." : "Login"}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <p>
           Don't have an account?{" "}
-          <a href="/register" className="text-blue-500 hover:underline">
+          <a href="/register" className="text-primary hover:underline">
             Register here
           </a>
         </p>

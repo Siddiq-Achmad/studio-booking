@@ -13,61 +13,65 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { usePDF } from "react-to-pdf";
+import { toast } from "sonner";
+import { format } from "date-fns";
 
-interface BookingDetails {
+interface Booking {
   id: string;
-  customerName: string;
+  name: string;
   email: string;
   phone: string;
-  date: string;
-  time: string;
+  bookingDate: string;
+  bookingTime: string;
   sessionType: string;
-  paymentStatus: "paid" | "halfPaid" | "notPaid" | "downPayment";
-  totalAmount: number;
-  paidAmount: number;
+  referralCode?: string;
+  status: string;
 }
 
 const BookingDetails = ({ bookingId }: { bookingId: string }) => {
-  const [booking, setBooking] = useState<BookingDetails | null>(null);
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { toPDF, targetRef } = usePDF({ filename: "booking-invoice.pdf" });
 
   useEffect(() => {
     // Simulating an API call to fetch booking details
-    const fetchBookingDetails = async () => {
-      // Replace this with an actual API call in a real application
-      const mockBooking: BookingDetails = {
-        id: bookingId,
-        customerName: "John Doe",
-        email: "john@example.com",
-        phone: "+1234567890",
-        date: "2023-06-15",
-        time: "14:00",
-        sessionType: "Portrait",
-        paymentStatus: "halfPaid",
-        totalAmount: 200,
-        paidAmount: 100,
-      };
-      setBooking(mockBooking);
+    const fetchBooking = async () => {
+      try {
+        const res = await fetch(`/api/booking/${bookingId}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          toast.error(data.error || "Failed to fetch booking.");
+          return;
+        }
+
+        setBooking(data);
+      } catch (error) {
+        console.error("Error fetching booking:", error);
+        toast.error("Something went wrong.");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchBookingDetails();
+    fetchBooking();
   }, [bookingId]);
+  if (loading) return <p className="text-center">Loading...</p>;
 
-  if (!booking) {
-    return <div>Loading...</div>;
-  }
+  if (!booking)
+    return <p className="text-center text-red-500">Booking not found.</p>;
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "paid":
+      case "PAID":
         return "bg-green-500";
-      case "halfPaid":
+      case "HALFPAID":
         return "bg-yellow-500";
-      case "notPaid":
+      case "UNPAID":
         return "bg-red-500";
-      case "downPayment":
-        return "bg-blue-500";
+      case "CANCELED":
+        return "bg-amber-500";
       default:
         return "bg-gray-500";
     }
@@ -85,25 +89,28 @@ const BookingDetails = ({ bookingId }: { bookingId: string }) => {
         <CardContent className="space-y-4">
           <div>
             <h3 className="font-semibold">Customer Information</h3>
-            <p>Name: {booking.customerName}</p>
+            <p>Name: {booking.name}</p>
             <p>Email: {booking.email}</p>
             <p>Phone: {booking.phone}</p>
           </div>
           <div>
             <h3 className="font-semibold">Session Details</h3>
-            <p>Date: {booking.date}</p>
-            <p>Time: {booking.time}</p>
-            <p>Type: {booking.sessionType}</p>
+            <p>
+              Date:{" "}
+              {booking.bookingDate
+                ? format(new Date(booking.bookingDate), " E, dd MMMM yyyy")
+                : ""}
+            </p>
+            <p>Time: {booking.bookingTime} WIB</p>
+            <p>Session Type: {booking.sessionType}</p>
           </div>
           <div>
             <h3 className="font-semibold">Payment Information</h3>
-            <p>Total Amount: ${booking.totalAmount}</p>
-            <p>Paid Amount: ${booking.paidAmount}</p>
-            <p>
-              Remaining Balance: ${booking.totalAmount - booking.paidAmount}
-            </p>
-            <Badge className={`mt-2 ${getStatusColor(booking.paymentStatus)}`}>
-              {booking.paymentStatus}
+            <p>Total Amount: Rp. 300.000</p>
+            <p>Paid Amount: Rp. 0</p>
+            <p>Remaining Balance: Rp. 300.000</p>
+            <Badge className={`mt-2 ${getStatusColor(booking.status)}`}>
+              {booking.status}
             </Badge>
           </div>
         </CardContent>

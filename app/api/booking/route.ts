@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { v4 as uuidv4 } from "uuid"
 
 const prisma = new PrismaClient();
 
@@ -9,15 +10,17 @@ export async function POST(req: Request) {
     const { name, email, phone, whatsapp, instagram, bookingDate, bookingTime, sessionType, referralCode } = data;
 
     // Cek apakah referralCode valid
-    let referrer = null;
-    if (referralCode) {
-      referrer = await prisma.user.findUnique({
-        where: { referralCode },
-      });
-    }
+    // let referrer = referralCode
+    // if (referralCode) {
+    //   referrer = await prisma.user.findUnique({
+    //     where: { referralCode },
+    //   });
+    // }
+    
 
     const newBooking = await prisma.booking.create({
       data: {
+        id: uuidv4(),
         name,
         email,
         phone,
@@ -26,7 +29,8 @@ export async function POST(req: Request) {
         bookingDate: new Date(bookingDate),
         bookingTime,
         sessionType,
-        referralCode: referrer ? referralCode : null, // Simpan referralCode hanya jika valid
+        referralCode,
+        //referralCode: referrer ? referralCode : null, // Simpan referralCode hanya jika valid
       },
     });
 

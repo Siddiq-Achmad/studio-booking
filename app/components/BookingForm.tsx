@@ -10,6 +10,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { CalendarIcon, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 
 import {
   Popover,
@@ -31,10 +32,11 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-import { DateInput, TimeField } from "@/components/ui/timefield";
 
 const BookingForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const referralId = searchParams.get("ref") || "";
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -45,8 +47,10 @@ const BookingForm = () => {
     bookingDate: undefined as Date | undefined,
     bookingTime: "",
     sessionType: "",
-    referralCode: "",
+    referralCode: referralId,
   });
+
+  console.log("Ref = ", referralId);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,11 +72,11 @@ const BookingForm = () => {
       return;
     }
 
-    const selectedDateTime = new Date(
+    const selectedDate = new Date(
       `${format(formData.bookingDate, "yyyy-MM-dd")}T${formData.bookingTime}`
     );
     const now = new Date();
-    if (selectedDateTime <= now) {
+    if (selectedDate <= now) {
       toast.error("Please select a future date and time for your booking.");
       setLoading(false);
       return;
@@ -88,7 +92,8 @@ const BookingForm = () => {
       const data = await res.json();
       if (res.ok) {
         toast.success("Booking successful!");
-        router.push(`/booking/success?id=${data.bookingId}`);
+        router.push(`/booking/success?id=${data.booking.id}`);
+        console.log(data);
       } else {
         toast.error(data.error || "Booking failed.");
       }
@@ -211,9 +216,22 @@ const BookingForm = () => {
                     />
                   </PopoverContent>
                 </Popover>
-                <TimeField>
-                  <DateInput className={"min-w-[100px]"} />
-                </TimeField>
+              </div>
+            </div>
+
+            {/* Booking Time Picker */}
+            <div className="space-y-2">
+              <Label htmlFor="bookingTime">Booking Time</Label>
+              <div className="flex justify-start items-center space-x-2 w-full">
+                <Input
+                  id="bookingTime"
+                  name="bookingTime"
+                  type="time"
+                  value={formData.bookingTime}
+                  onChange={(e) =>
+                    setFormData({ ...formData, bookingTime: e.target.value })
+                  }
+                />
               </div>
             </div>
 

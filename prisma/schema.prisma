@@ -9,24 +9,28 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL") + "?timezone=Asia/Jakarta"
 }
 
 model User {
-  id           String  @id @default(uuid()) @map("id")
-  name         String
-  email        String  @unique
-  password     String
-  referralCode String?  @unique
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(USER)
+  referralCode  String?   @unique
 
-  bookings     Booking[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  bookings      Booking[] // ✅ User bisa memiliki banyak Booking
 }
 
 model Booking {
-  id           String  @id @default(uuid()) @map("id")
+  id           String  @id @default(uuid())
+  userId       String? // 🔹 Optional karena bisa booking tanpa login
   name         String
   email        String
   phone        String
@@ -36,8 +40,61 @@ model Booking {
   bookingTime  String
   sessionType  String
   referralCode String?
-
-  referrer     User?    @relation(fields: [referralCode], references: [referralCode])
+  status       Status  @default(UNPAID)
+  
+  // ✅ Hubungan ke User (Booking bisa milik user atau tanpa user)
+  user         User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   createdAt    DateTime @default(now())
 }
+
+// ✅ Model lainnya tetap sama
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ✅ Enums untuk Role & Status
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  UNPAID
+  PAID
+  HALFPAID
+  CANCELED
+}
+
+

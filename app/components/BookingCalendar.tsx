@@ -1,70 +1,71 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Calendar, momentLocalizer } from "react-big-calendar"
-import moment from "moment"
-import "react-big-calendar/lib/css/react-big-calendar.css"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
-const localizer = momentLocalizer(moment)
+const localizer = momentLocalizer(moment);
 
 interface BookingEvent {
-  id: number
-  title: string
-  start: Date
-  end: Date
-  paymentStatus: "paid" | "halfPaid" | "notPaid" | "downPayment"
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  paymentStatus: "paid" | "halfPaid" | "notPaid" | "downPayment";
 }
 
-const sampleBookings: BookingEvent[] = [
-  {
-    id: 1,
-    title: "Portrait Session",
-    start: new Date(2023, 5, 1, 10, 0),
-    end: new Date(2023, 5, 1, 12, 0),
-    paymentStatus: "paid",
-  },
-  {
-    id: 2,
-    title: "Wedding Shoot",
-    start: new Date(2023, 5, 3, 14, 0),
-    end: new Date(2023, 5, 3, 18, 0),
-    paymentStatus: "halfPaid",
-  },
-  {
-    id: 3,
-    title: "Family Photo Session",
-    start: new Date(2023, 5, 5, 11, 0),
-    end: new Date(2023, 5, 5, 13, 0),
-    paymentStatus: "notPaid",
-  },
-  {
-    id: 4,
-    title: "Product Photography",
-    start: new Date(2023, 5, 7, 9, 0),
-    end: new Date(2023, 5, 7, 11, 0),
-    paymentStatus: "downPayment",
-  },
-]
-
 const BookingCalendar = () => {
-  const [selectedEvent, setSelectedEvent] = useState<BookingEvent | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<BookingEvent | null>(null);
+  const [bookings, setBookings] = useState<BookingEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const response = await fetch("/api/bookings");
+        if (!response.ok) {
+          throw new Error("Failed to fetch bookings");
+        }
+        const data = await response.json();
+        const formattedBookings = data.map((booking: any) => ({
+          id: booking.id,
+          title: `${booking.sessionType} - ${booking.user.name}`,
+          start: new Date(`${booking.date}T${booking.time}`),
+          end: new Date(`${booking.date}T${booking.time}`),
+          paymentStatus: booking.paymentStatus,
+        }));
+        setBookings(formattedBookings);
+      } catch (err) {
+        setError("Error fetching bookings. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, []);
 
   const eventStyleGetter = (event: BookingEvent) => {
-    let backgroundColor = ""
+    let backgroundColor = "";
     switch (event.paymentStatus) {
       case "paid":
-        backgroundColor = "hsl(var(--success))" // Green
-        break
+        backgroundColor = "hsl(var(--success))";
+        break;
       case "halfPaid":
-        backgroundColor = "hsl(var(--warning))" // Amber
-        break
+        backgroundColor = "hsl(var(--warning))";
+        break;
       case "notPaid":
-        backgroundColor = "hsl(var(--destructive))" // Red
-        break
+        backgroundColor = "hsl(var(--destructive))";
+        break;
       case "downPayment":
-        backgroundColor = "hsl(var(--primary))" // Blue
-        break
+        backgroundColor = "hsl(var(--primary))";
+        break;
     }
 
     return {
@@ -76,11 +77,25 @@ const BookingCalendar = () => {
         border: "0px",
         display: "block",
       },
-    }
-  }
+    };
+  };
 
   const handleSelectEvent = (event: BookingEvent) => {
-    setSelectedEvent(event)
+    setSelectedEvent(event);
+  };
+
+  const handleViewDetails = () => {
+    if (selectedEvent) {
+      router.push(`/bookings/${selectedEvent.id}`);
+    }
+  };
+
+  if (isLoading) {
+    return <div>Loading bookings...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   return (
@@ -88,7 +103,7 @@ const BookingCalendar = () => {
       <div className="md:w-3/4 p-4">
         <Calendar
           localizer={localizer}
-          events={sampleBookings}
+          events={bookings}
           startAccessor="start"
           endAccessor="end"
           style={{ height: "100%" }}
@@ -108,14 +123,15 @@ const BookingCalendar = () => {
                   <strong>Title:</strong> {selectedEvent.title}
                 </p>
                 <p>
-                  <strong>Start:</strong> {moment(selectedEvent.start).format("MMMM D, YYYY h:mm A")}
-                </p>
-                <p>
-                  <strong>End:</strong> {moment(selectedEvent.end).format("MMMM D, YYYY h:mm A")}
+                  <strong>Start:</strong>{" "}
+                  {moment(selectedEvent.start).format("MMMM D, YYYY h:mm A")}
                 </p>
                 <p>
                   <strong>Payment Status:</strong> {selectedEvent.paymentStatus}
                 </p>
+                <Button onClick={handleViewDetails} className="mt-4">
+                  View Full Details
+                </Button>
               </div>
             ) : (
               <p>Select an event to view details</p>
@@ -149,8 +165,7 @@ const BookingCalendar = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BookingCalendar
-
+export default BookingCalendar;

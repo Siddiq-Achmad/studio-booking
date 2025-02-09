@@ -9,47 +9,40 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function RegisterForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        toast({
-          title: "Registration Successful",
-          description: "Your account has been created successfully.",
-        });
-        router.push("/login"); // Redirect to login page
-      } else {
-        toast({
-          title: "Registration Failed",
-          description: data.error,
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Registration Failed",
-        description: "An error occurred. Please try again.",
-        variant: "destructive",
-      });
+    setLoading(true);
+
+    const res = await fetch("/api/register", {
+      method: "POST",
+      body: JSON.stringify(formData),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    setLoading(false);
+
+    if (!res.ok) {
+      toast.error("Registrasi gagal!");
+      return;
     }
+
+    toast.success("Registrasi berhasil! Silakan login.");
+    router.push("/login");
   };
 
   return (
@@ -66,10 +59,13 @@ export default function RegisterForm() {
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              placeholder="Enter your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              type="text"
+              placeholder="Nama"
               required
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
             />
           </div>
           <div className="space-y-2">
@@ -77,32 +73,35 @@ export default function RegisterForm() {
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
               required
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <Input
-              id="password"
               type="password"
-              placeholder="Create a password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
               required
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
             />
           </div>
-          <Button type="submit" className="w-full">
-            Register
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Registering..." : "Register"}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <p>
           Already have an account?{" "}
-          <a href="/login" className="text-blue-500 hover:underline">
+          <a href="/login" className="text-primary hover:underline">
             Login here
           </a>
         </p>

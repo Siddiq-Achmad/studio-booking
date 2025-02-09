@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
+
     content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -50,7 +51,10 @@ export default {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
-  		
+  		backgroundImage: {
+  			'grid-pattern': '',
+  			'grid-pattern-light': ''
+  		}
   	}
   },
   plugins: [require("tailwindcss-animate")],

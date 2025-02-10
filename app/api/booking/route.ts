@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from "uuid";
+
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,12 @@ export async function POST(req: Request) {
     // }
     
 
+    // Gabungkan tanggal dan waktu
+    // const localDateTime = formatDateTime(bookingDate);
+    // const utcDateTime = toUTC(localDateTime);
+
+    
+
     const newBooking = await prisma.booking.create({
       data: {
         id: uuidv4(),
@@ -26,7 +33,7 @@ export async function POST(req: Request) {
         phone,
         whatsapp,
         instagram,
-        bookingDate: new Date(bookingDate).toLocaleString(),
+        bookingDate,
         bookingTime,
         sessionType,
         referralCode,
@@ -36,6 +43,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, booking: newBooking }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: "Terjadi kesalahan", message: req }, { status: 500 });
+    return NextResponse.json({ error: "Terjadi kesalahan", message: error }, { status: 500 });
   }
 }

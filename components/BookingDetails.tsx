@@ -57,6 +57,23 @@ const BookingDetails = ({ bookingId }: { bookingId: string }) => {
 
     fetchBooking();
   }, [bookingId]);
+
+  const handleDownloadPDF = async () => {
+    const response = await fetch(`/api/booking/${bookingId}/pdf`);
+    if (!response.ok) {
+      console.error("Failed to download PDF");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `invoice-${bookingId}.pdf`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (loading)
     return (
       <div className=" p-8 w-full mx-auto text-center flex justify-center items-center">
@@ -125,7 +142,7 @@ const BookingDetails = ({ bookingId }: { bookingId: string }) => {
         <Button variant="outline" onClick={() => router.back()}>
           Back
         </Button>
-        <Button onClick={() => toPDF()}>Download Invoice</Button>
+        <Button onClick={handleDownloadPDF}>Download Invoice</Button>
       </CardFooter>
     </Card>
   );

@@ -32,6 +32,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import moment from "moment";
+import { formatDateTime } from "@/lib/time";
 
 const BookingForm = () => {
   const router = useRouter();
@@ -45,8 +47,6 @@ const BookingForm = () => {
     setReferralCode(code);
   }, [searchParams]);
 
-  console.log("Ref=", referralCode);
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -56,7 +56,7 @@ const BookingForm = () => {
     bookingDate: new Date() as Date | undefined,
     bookingTime: "",
     sessionType: "",
-    referralCode,
+    referralCode: referralCode ?? "-",
   });
 
   // Handler untuk update bookingTime & sinkronisasi dengan bookingDate
@@ -234,7 +234,7 @@ const BookingForm = () => {
                       onSelect={(date) =>
                         setFormData((prev) => ({
                           ...prev,
-                          bookingDate: date as Date,
+                          bookingDate: date,
                         }))
                       }
                       disabled={(date) => date < new Date()}

@@ -82,6 +82,7 @@ const BookingCalendar = () => {
 
   const handleSelectEvent = (eventInfo: any) => {
     setSelectedEvent(eventInfo);
+    console.log(selectedEvent);
   };
 
   const handleViewDetails = () => {
@@ -129,25 +130,30 @@ const BookingCalendar = () => {
           </CardHeader>
           <CardContent>
             {selectedEvent && selectedEvent.event ? (
-              <div>
-                <p>
+              <div className="flex flex-col gap-2">
+                <div>
                   <strong>Name:</strong> {selectedEvent.event.title}
-                </p>
-                <p>
-                  <strong>Booking :</strong>{" "}
-                  <strong>
-                    {moment(selectedEvent.event.start).format("HH:mm")}{" "}
-                  </strong>
-                  - {moment(selectedEvent.event.start).format("MMMM D, YYYY")}
-                </p>
-                <p>
+                </div>
+                <div>
+                  <strong>Booking Time:</strong>{" "}
+                  <span>
+                    {moment(selectedEvent.event.start).format("HH:mm")} WIB
+                  </span>
+                </div>
+                <div>
+                  <strong>Booking Date:</strong>{" "}
+                  <span>
+                    {moment(selectedEvent.event.start).format("MMMM D, YYYY")}
+                  </span>
+                </div>
+                <div>
                   <strong>Payment Status:</strong>{" "}
                   <Badge
                     className={selectedEvent.event.extendedProps.className}
                   >
                     {selectedEvent.event.extendedProps.status}
                   </Badge>
-                </p>
+                </div>
                 <Button onClick={handleViewDetails} className="mt-4">
                   View Full Details
                 </Button>

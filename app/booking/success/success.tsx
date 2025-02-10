@@ -1,6 +1,12 @@
 "use client";
 
 import Invoice from "@/components/Invoice";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,7 +24,7 @@ const SuccessContent = () => {
   const bookingId = searchParams.get("id");
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div id="instruction" className="container mx-auto px-4 py-8">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Booking Successful!</CardTitle>
@@ -31,26 +37,64 @@ const SuccessContent = () => {
           <p className="mb-2">
             Please make your payment to the following account:
           </p>
-          <p>Account Name: Achmad Siddiq Maulidi</p>
-          <p>Account Number: 1234567890</p>
-          <p>Bank: BSI </p>
-          <p className="mt-4">
+
+          <Accordion type="single" collapsible className="w-full mb-8">
+            <AccordionItem value="item-1">
+              <AccordionTrigger className="font-bold uppercase">
+                Bank Aceh
+              </AccordionTrigger>
+              <AccordionContent>
+                <p>
+                  Account Name:
+                  <span> Achmad Siddiq Maulidi</span>
+                </p>
+                <p>
+                  Account Number: <strong>01002202111987</strong>
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger className="font-bold uppercase">
+                Bank BSI
+              </AccordionTrigger>
+              <AccordionContent>
+                <p>Account Name: Achmad Siddiq Maulidi</p>
+                <p>
+                  Account Number: <strong>7141713633</strong>
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger className="font-bold uppercase">
+                Bank Mandiri
+              </AccordionTrigger>
+              <AccordionContent>
+                <p>Account Name: Achmad Siddiq Maulidi</p>
+                <p>
+                  Acoount Number: <strong>1050018691679</strong>
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          <p className="mt-4 text-sm">
             After making the payment, please confirm by sending a image of the
             payment to: <br />
             WhatsApp / SMS :{" "}
             <Link
               href="https://wa.me/628990001664"
               target="_blank"
-              className="text-primary text-2xl font-bold"
+              className="text-primary text-2xl"
             >
-              <Button variant="ghost">+62 899 0001 664</Button>
-            </Link>
+              <Button variant="outline">+62 899 0001 664</Button>
+            </Link>{" "}
+            (Admin LUXIMA)
           </p>
         </CardContent>
         <CardFooter className="flex justify-between">
           <div className="flex items-center space-x-2">
             <Button variant="outline" onClick={() => window.print()}>
-              Print Instructions
+              Print
             </Button>
             <Link href={`/booking/${bookingId}`}>
               <Button variant="outline">View Details</Button>

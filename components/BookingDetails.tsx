@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { usePDF } from "react-to-pdf";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -32,7 +31,6 @@ const BookingDetails = ({ bookingId }: { bookingId: string }) => {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { toPDF, targetRef } = usePDF({ filename: "booking-invoice.pdf" });
 
   useEffect(() => {
     // Simulating an API call to fetch booking details
@@ -102,7 +100,7 @@ const BookingDetails = ({ bookingId }: { bookingId: string }) => {
 
   return (
     <Card className="max-w-2xl mx-auto">
-      <div ref={targetRef}>
+      <div>
         <CardHeader>
           <CardTitle>Booking #{booking.id}</CardTitle>
           <CardDescription>

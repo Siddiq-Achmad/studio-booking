@@ -10,7 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { usePDF } from "react-to-pdf";
 import moment from "moment";
 
 interface InvoiceProps {
@@ -33,7 +32,6 @@ const Invoice: React.FC<InvoiceProps> = ({ bookingId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
-  const { toPDF, targetRef } = usePDF({ filename: `invoice-${bookingId}.pdf` });
 
   useEffect(() => {
     async function fetchBooking() {
@@ -84,7 +82,7 @@ const Invoice: React.FC<InvoiceProps> = ({ bookingId }) => {
               Invoice for booking {bookingId}
             </DialogDescription>
           </DialogHeader>
-          <div ref={targetRef} className="p-6">
+          <div className="p-6">
             <h2 className="text-2xl font-bold mb-4">LUXIMA Studio</h2>
             <div className="mb-4">
               <p>Invoice #: {booking.id}</p>

@@ -270,13 +270,17 @@ const BookingForm = () => {
                   <SelectValue placeholder="Select a session type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="wedding">Wedding</SelectItem>
+                  <SelectItem value="wedding" disabled>
+                    Wedding
+                  </SelectItem>
                   <SelectItem value="birthday">Birthday</SelectItem>
                   <SelectItem value="graduation">Graduation</SelectItem>
                   <SelectItem value="portrait">Portrait</SelectItem>
                   <SelectItem value="family">Family</SelectItem>
                   <SelectItem value="product">Product</SelectItem>
-                  <SelectItem value="event">Event</SelectItem>
+                  <SelectItem value="event" disabled>
+                    Event
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -22,7 +22,7 @@ const ReferralSystem = () => {
   const generateReferralCode = () => {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     setReferralCode(code);
-    const link = `https://studio.luxima.id/ref/${code}`;
+    const link = `https://studio.luxima.id/booking?ref=${code}`;
     setReferralLink(link);
   };
 

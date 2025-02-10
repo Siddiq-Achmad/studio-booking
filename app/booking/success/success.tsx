@@ -52,7 +52,7 @@ const SuccessContent = () => {
             <Button variant="outline" onClick={() => window.print()}>
               Print Instructions
             </Button>
-            <Link href={`/bookings/${bookingId}`}>
+            <Link href={`/booking/${bookingId}`}>
               <Button variant="outline">View Details</Button>
             </Link>
           </div>

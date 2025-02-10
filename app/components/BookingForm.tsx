@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -35,9 +35,18 @@ import { toast } from "sonner";
 
 const BookingForm = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const referralId = searchParams.get("ref") || "";
   const [loading, setLoading] = useState(false);
+
+  const searchParams = useSearchParams();
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    const code = searchParams.get("ref");
+    setReferralCode(code);
+  }, [searchParams]);
+
+  console.log("Ref=", referralCode);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -47,10 +56,8 @@ const BookingForm = () => {
     bookingDate: undefined as Date | undefined,
     bookingTime: "",
     sessionType: "",
-    referralCode: referralId,
+    referralCode,
   });
-
-  console.log("Ref = ", referralId);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -113,7 +120,10 @@ const BookingForm = () => {
     >
       <Card className="w-full max-w-lg mx-auto">
         <CardHeader>
-          <CardTitle>Book Your Session</CardTitle>
+          <CardTitle className="flex justify-between mb-4">
+            Book Your Session{" "}
+            {referralCode && <span>Ref. {referralCode} </span>}
+          </CardTitle>
           <CardDescription>
             Fill out the form below to schedule your photography session
           </CardDescription>

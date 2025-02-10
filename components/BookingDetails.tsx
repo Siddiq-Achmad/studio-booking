@@ -57,7 +57,13 @@ const BookingDetails = ({ bookingId }: { bookingId: string }) => {
 
     fetchBooking();
   }, [bookingId]);
-  if (loading) return <p className="text-center">Loading...</p>;
+  if (loading)
+    return (
+      <div className=" p-8 w-full mx-auto text-center flex justify-center items-center">
+        <h1 className="text-4xl font-bold p-6">Loading ... </h1>
+        <p className="text-2xl font-light">| Fetching data </p>
+      </div>
+    );
 
   if (!booking)
     return <p className="text-center text-red-500">Booking not found.</p>;
@@ -71,7 +77,7 @@ const BookingDetails = ({ bookingId }: { bookingId: string }) => {
       case "UNPAID":
         return "bg-red-500";
       case "CANCELED":
-        return "bg-amber-500";
+        return "bg-purple-500";
       default:
         return "bg-gray-500";
     }

@@ -26,7 +26,7 @@ export async function POST(req: Request) {
         phone,
         whatsapp,
         instagram,
-        bookingDate: new Date(bookingDate),
+        bookingDate: new Date(bookingDate).toLocaleString(),
         bookingTime,
         sessionType,
         referralCode,

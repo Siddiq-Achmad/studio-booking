@@ -53,11 +53,29 @@ const BookingForm = () => {
     phone: "",
     whatsapp: "",
     instagram: "",
-    bookingDate: undefined as Date | undefined,
+    bookingDate: new Date() as Date | undefined,
     bookingTime: "",
     sessionType: "",
     referralCode,
   });
+
+  // Handler untuk update bookingTime & sinkronisasi dengan bookingDate
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = e.target.value; // Ambil waktu "HH:mm"
+
+    if (formData.bookingDate) {
+      const [hours, minutes] = time.split(":").map(Number);
+      const updatedDate = new Date(formData.bookingDate);
+      updatedDate.setHours(hours);
+      updatedDate.setMinutes(minutes);
+
+      setFormData({
+        ...formData,
+        bookingTime: time,
+        bookingDate: updatedDate, // Update bookingDate dengan jam baru
+      });
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -212,16 +230,14 @@ const BookingForm = () => {
                     <Calendar
                       id="bookingDate"
                       mode="single"
-                      selected={formData.bookingDate}
+                      selected={formData.bookingDate as Date}
                       onSelect={(date) =>
                         setFormData((prev) => ({
                           ...prev,
-                          bookingDate: date || undefined,
+                          bookingDate: date as Date,
                         }))
                       }
-                      disabled={(date) =>
-                        date < new Date() || date < new Date("2000-01-01")
-                      }
+                      disabled={(date) => date < new Date()}
                       initialFocus
                     />
                   </PopoverContent>
@@ -238,9 +254,7 @@ const BookingForm = () => {
                   name="bookingTime"
                   type="time"
                   value={formData.bookingTime}
-                  onChange={(e) =>
-                    setFormData({ ...formData, bookingTime: e.target.value })
-                  }
+                  onChange={handleTimeChange}
                 />
               </div>
             </div>

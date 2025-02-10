@@ -1,21 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-
-const localizer = momentLocalizer(moment);
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { Badge } from "@/components/ui/badge";
 
 interface BookingEvent {
+  event: any;
   id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  paymentStatus: "paid" | "halfPaid" | "notPaid" | "downPayment";
+  name: string;
+  bookingDate: string; // Format ISO (YYYY-MM-DD)
+  bookingTime: string; // Format HH:mm:ss
+  status: string;
+  sessionType: string;
+  className?: string;
 }
 
 const BookingCalendar = () => {
@@ -33,14 +37,7 @@ const BookingCalendar = () => {
           throw new Error("Failed to fetch bookings");
         }
         const data = await response.json();
-        const formattedBookings = data.map((booking: any) => ({
-          id: booking.id,
-          title: `${booking.sessionType} - ${booking.user.name}`,
-          start: new Date(`${booking.date}T${booking.time}`),
-          end: new Date(`${booking.date}T${booking.time}`),
-          paymentStatus: booking.paymentStatus,
-        }));
-        setBookings(formattedBookings);
+        setBookings(data);
       } catch (err) {
         setError("Error fetching bookings. Please try again.");
       } finally {
@@ -51,64 +48,78 @@ const BookingCalendar = () => {
     fetchBookings();
   }, []);
 
-  const eventStyleGetter = (event: BookingEvent) => {
-    let backgroundColor = "";
-    switch (event.paymentStatus) {
-      case "paid":
-        backgroundColor = "hsl(var(--success))";
-        break;
-      case "halfPaid":
-        backgroundColor = "hsl(var(--warning))";
-        break;
-      case "notPaid":
-        backgroundColor = "hsl(var(--destructive))";
-        break;
-      case "downPayment":
-        backgroundColor = "hsl(var(--primary))";
-        break;
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PAID":
+        return "bg-green-500";
+      case "HALFPAID":
+        return "bg-yellow-500";
+      case "UNPAID":
+        return "bg-red-500";
+      case "CANCELED":
+        return "bg-purple-500";
+      default:
+        return "bg-gray-500";
     }
-
-    return {
-      style: {
-        backgroundColor,
-        borderRadius: "5px",
-        opacity: 0.8,
-        color: "white",
-        border: "0px",
-        display: "block",
-      },
-    };
   };
 
-  const handleSelectEvent = (event: BookingEvent) => {
-    setSelectedEvent(event);
+  const events = bookings.map((booking) => ({
+    id: booking.id,
+    title: booking.name,
+
+    start: `${
+      booking.bookingDate
+        ? moment(booking.bookingDate).format("YYYY-MM-DD HH:mm:ss")
+        : ""
+    }`, // Gabungkan tanggal dan waktu
+    className: getStatusColor(booking.status),
+    extendedProps: {
+      status: booking.status,
+      sessionType: booking.sessionType,
+      className: getStatusColor(booking.status),
+    },
+  }));
+
+  const handleSelectEvent = (eventInfo: any) => {
+    setSelectedEvent(eventInfo);
   };
 
   const handleViewDetails = () => {
     if (selectedEvent) {
-      router.push(`/bookings/${selectedEvent.id}`);
+      router.push(`/bookings/${selectedEvent.event.id}`);
     }
   };
 
-  if (isLoading) {
-    return <div>Loading bookings...</div>;
-  }
+  if (isLoading)
+    return (
+      <div className=" p-8 w-full h-[80vh] mx-auto text-center flex justify-center items-center">
+        <h1 className="text-4xl font-bold p-6">Loading ... </h1>
+        <p className="text-2xl font-light">| Fetching data </p>
+      </div>
+    );
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div className=" p-8 w-full h-[80vh] mx-auto text-center flex justify-center items-center">
+        <h1 className="text-4xl font-bold p-6">Error </h1>
+        <p className="text-2xl font-light">| {error}</p>
+      </div>
+    );
   }
 
   return (
     <div className="h-screen flex flex-col md:flex-row">
       <div className="md:w-3/4 p-4">
-        <Calendar
-          localizer={localizer}
-          events={bookings}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: "100%" }}
-          eventPropGetter={eventStyleGetter}
-          onSelectEvent={handleSelectEvent}
+        <FullCalendar
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+          events={events}
+          eventClick={(events) => handleSelectEvent(events)}
         />
       </div>
       <div className="md:w-1/4 p-4">
@@ -117,17 +128,25 @@ const BookingCalendar = () => {
             <CardTitle>Booking Details</CardTitle>
           </CardHeader>
           <CardContent>
-            {selectedEvent ? (
+            {selectedEvent && selectedEvent.event ? (
               <div>
                 <p>
-                  <strong>Title:</strong> {selectedEvent.title}
+                  <strong>Name:</strong> {selectedEvent.event.title}
                 </p>
                 <p>
-                  <strong>Start:</strong>{" "}
-                  {moment(selectedEvent.start).format("MMMM D, YYYY h:mm A")}
+                  <strong>Booking :</strong>{" "}
+                  <strong>
+                    {moment(selectedEvent.event.start).format("HH:mm")}{" "}
+                  </strong>
+                  - {moment(selectedEvent.event.start).format("MMMM D, YYYY")}
                 </p>
                 <p>
-                  <strong>Payment Status:</strong> {selectedEvent.paymentStatus}
+                  <strong>Payment Status:</strong>{" "}
+                  <Badge
+                    className={selectedEvent.event.extendedProps.className}
+                  >
+                    {selectedEvent.event.extendedProps.status}
+                  </Badge>
                 </p>
                 <Button onClick={handleViewDetails} className="mt-4">
                   View Full Details
@@ -145,20 +164,20 @@ const BookingCalendar = () => {
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center">
-                <div className="w-4 h-4 bg-success mr-2"></div>
+                <div className="w-4 h-4 bg-green-500 mr-2"></div>
                 <span>Paid</span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 bg-warning mr-2"></div>
+                <div className="w-4 h-4 bg-yellow-500 mr-2"></div>
                 <span>Half Paid</span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 bg-destructive mr-2"></div>
+                <div className="w-4 h-4 bg-red-500 mr-2"></div>
                 <span>Not Paid</span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 bg-primary mr-2"></div>
-                <span>Down Payment</span>
+                <div className="w-4 h-4 bg-purple-500 mr-2"></div>
+                <span>Canceled</span>
               </div>
             </div>
           </CardContent>

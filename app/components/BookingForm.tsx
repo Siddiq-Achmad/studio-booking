@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
@@ -11,7 +11,8 @@ import { format } from "date-fns";
 import { CalendarIcon, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import {
   Popover,
   PopoverContent,
@@ -31,14 +32,12 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { toast } from "sonner";
-import moment from "moment";
-import { formatDateTime } from "@/lib/time";
 
 const BookingForm = () => {
+  const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const searchParams = useSearchParams();
   const [referralCode, setReferralCode] = useState<string | null>(null);
 
@@ -86,13 +85,52 @@ const BookingForm = () => {
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
+  const checkAvailability = async () => {
+    if (!formData.bookingDate) {
+      return false;
+    }
+
+    const response = await fetch("/api/booking/check-availability", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        bookingDate: formData.bookingDate,
+      }),
+    });
+
+    const data = await response.json();
+    if (!data.available) {
+      toast({
+        title: "Booking Unavailable",
+        description: data.message,
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
+    const isAvailable = await checkAvailability();
+    console.log(isAvailable);
+    alert(
+      "Sudah ada yang booking pada tanggal dan jam ini, Silahkan pilih tanggal dan waktu lain. Untuk memastikan booking anda, Silahkan klik Bookings Calendar untuk melihat booking yang tersedia."
+    );
+    setLoading(false);
+    if (!isAvailable) return;
+
+    setIsSubmitting(true);
+
     // Validasi Date & Time
     if (!formData.bookingDate) {
-      toast.error("Please select a booking date.");
+      toast({
+        title: "Please select a booking date.",
+        description: "Silahkan pilih tanggal dan jam booking.",
+      });
       setLoading(false);
       return;
     }
@@ -102,7 +140,10 @@ const BookingForm = () => {
     );
     const now = new Date();
     if (selectedDate <= now) {
-      toast.error("Please select a future date and time for your booking.");
+      toast({
+        title: "Please select a future date.",
+        description: "Silahkan pilih tanggal dan jam booking.",
+      });
       setLoading(false);
       return;
     }
@@ -116,17 +157,20 @@ const BookingForm = () => {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Booking successful!");
+        toast({
+          title: "Booking Success",
+          description: "Silahkan klik link untuk melihat detail booking.",
+        });
         router.push(`/booking/success?id=${data.booking.id}`);
         console.log(data);
       } else {
-        toast.error(data.error || "Booking failed.");
+        toast({ title: "Booking Failed", description: data.error });
       }
     } catch (error) {
       console.error("Booking error:", error);
-      toast.error("Something went wrong.");
+      toast({ title: "Booking Failed", description: "Terjadi kesalahan." });
     }
-
+    setIsSubmitting(false);
     setLoading(false);
   };
 

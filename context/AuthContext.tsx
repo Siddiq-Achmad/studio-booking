@@ -1,14 +1,14 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 
 type User = {
   id: string;
   name: string;
   email: string;
-  role?: string;
-  avatar?: string;
+  role: string;
+  image: string;
 };
 
 type AuthContextType = {
@@ -19,26 +19,32 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const { data: session, status } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadSession = async () => {
-      const session = await getSession();
+    const fetchUser = async () => {
       if (session?.user) {
-        setUser({
-          id: session.user.id,
-          name: session.user.name!,
-          email: session.user.email!,
-          role: session.user.role ? session.user.role : "USER",
-          avatar: session.user.avatar ? session.user.avatar : "",
-        });
+        try {
+          const res = await fetch(`/api/user/${session.user.email}`);
+          const data = await res.json();
+          setUser({
+            id: data.id,
+            name: data.name,
+            email: data.email,
+            role: data.role,
+            image: data.image,
+          });
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
       }
       setLoading(false);
     };
 
-    loadSession();
-  }, []);
+    fetchUser();
+  }, [session]);
 
   return (
     <AuthContext.Provider value={{ user, loading }}>

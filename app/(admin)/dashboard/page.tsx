@@ -23,9 +23,12 @@ import {
 } from "@/components/ui/sidebar";
 import moment from "moment";
 import { LogOut } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -65,6 +68,10 @@ export default function DashboardPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-4 px-4">
+            <Avatar>
+              <AvatarImage src={user?.image} alt={user?.name} />
+              <AvatarFallback className="rounded-full">CN</AvatarFallback>
+            </Avatar>
             <p>{session?.user?.name}</p>
             <Button onClick={() => signOut({ callbackUrl: "/login" })}>
               <LogOut size={18} /> Logout
@@ -78,9 +85,13 @@ export default function DashboardPage() {
                 <CardTitle>Dashboard</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Welcome, {session?.user?.name}!</p>
-                <p>Email : {session?.user?.email}</p>
-                <p>Your ID : {session?.user?.id}</p>
+                <Avatar>
+                  <AvatarImage src={user?.image} alt={user?.name} />
+                </Avatar>
+                <p>Welcome, {user?.name}!</p>
+                <p>Email : {user?.email}</p>
+                <p>Your ID : {user?.id}</p>
+                <p>Roles : {user?.role}</p>
                 <p>
                   Expired At :{" "}
                   {moment(session?.expires).format(" DD-MM-YYYY HH:mm:ss")}

@@ -25,6 +25,8 @@ import moment from "moment";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import TableData from "@/app/components/TableData";
+import TableUser from "@/app/components/TableUser";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -102,7 +104,11 @@ export default function DashboardPage() {
             <div className="bg-neutral-100/50 aspect-video rounded-xl " />
             <div className="bg-neutral-100/50 aspect-video rounded-xl " />
           </div>
-          <div className="bg-neutral-100/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min " />
+          <div className="bg-neutral-100/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min p-4 ">
+            <TableUser />
+            <Separator className="my-4" />
+            <TableData />
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 const AnimatedHero = () => {
   return (
@@ -46,8 +46,7 @@ const AnimatedHero = () => {
         </motion.button>
       </div>
     </motion.div>
-  )
-}
+  );
+};
 
-export default AnimatedHero
-
+export default AnimatedHero;

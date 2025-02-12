@@ -30,6 +30,7 @@ interface Booking {
 const BookingDetails = ({ bookingId }: { bookingId: string }) => {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
+  const [btnLoading, setBtnLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -57,6 +58,7 @@ const BookingDetails = ({ bookingId }: { bookingId: string }) => {
   }, [bookingId]);
 
   const handleDownloadPDF = async () => {
+    setBtnLoading(true);
     const response = await fetch(`/api/booking/${bookingId}/pdf`);
     if (!response.ok) {
       console.error("Failed to download PDF");
@@ -70,6 +72,7 @@ const BookingDetails = ({ bookingId }: { bookingId: string }) => {
     link.download = `invoice-${bookingId}.pdf`;
     link.click();
     URL.revokeObjectURL(url);
+    setBtnLoading(false);
   };
 
   if (loading)
@@ -140,7 +143,16 @@ const BookingDetails = ({ bookingId }: { bookingId: string }) => {
         <Button variant="outline" onClick={() => router.back()}>
           Back
         </Button>
-        <Button onClick={handleDownloadPDF}>Download Invoice</Button>
+        <Button onClick={handleDownloadPDF} disabled={btnLoading}>
+          {btnLoading ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-primary"></div>
+              <span className="ml-2">Downloading ...</span>
+            </div>
+          ) : (
+            "Download Invoice"
+          )}
+        </Button>
       </CardFooter>
     </Card>
   );

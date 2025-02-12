@@ -8,7 +8,7 @@ export default function LogoutButton() {
   return (
     <Button
       variant="outline"
-      className="flex items-center gap-2"
+      className="flex items-center gap-2 w-full"
       onClick={() => signOut({ callbackUrl: "/login" })}
     >
       <LogOut size={18} /> Logout

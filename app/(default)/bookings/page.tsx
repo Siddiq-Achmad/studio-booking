@@ -1,4 +1,4 @@
-import BookingCalendar from "../components/BookingCalendar"
+import BookingCalendar from "../../components/BookingCalendar";
 
 export default function BookingsPage() {
   return (
@@ -6,6 +6,5 @@ export default function BookingsPage() {
       <h1 className="text-3xl font-bold mb-6 text-center">Booking Calendar</h1>
       <BookingCalendar />
     </div>
-  )
+  );
 }
-

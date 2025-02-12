@@ -30,7 +30,7 @@ export async function GET(req: NextRequest,  context: { params: Promise<{ id: st
       <html>
         <head>
           <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
+            body { font-family: Plus Jakarta Sans, sans-serif; padding: 20px; }
             .container { max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; }
             h1 { text-align: center; }
             .invoice-details { margin-top: 20px; }

@@ -26,6 +26,7 @@ const BookingCalendar = () => {
   const [selectedEvent, setSelectedEvent] = useState<BookingEvent | null>(null);
   const [bookings, setBookings] = useState<BookingEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [btnLoading, setBtnLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -154,8 +155,12 @@ const BookingCalendar = () => {
                     {selectedEvent.event.extendedProps.status}
                   </Badge>
                 </div>
-                <Button onClick={handleViewDetails} className="mt-4">
-                  View Full Details
+                <Button
+                  onClick={handleViewDetails}
+                  className="mt-4"
+                  disabled={btnLoading}
+                >
+                  {btnLoading ? "Loading..." : "View Details"}
                 </Button>
               </div>
             ) : (

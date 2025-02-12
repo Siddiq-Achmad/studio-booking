@@ -1,4 +1,4 @@
-import ReferralSystem from "../components/ReferralSystem";
+import ReferralSystem from "../../components/ReferralSystem";
 
 export default function Referral() {
   return (

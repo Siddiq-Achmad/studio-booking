@@ -1,60 +1,64 @@
-import { NextAuthOptions } from "next-auth";
+// lib/auth.ts
+import { DefaultSession, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+
 
 
 const prisma = new PrismaClient();
 
+
+
 export const authOptions: NextAuthOptions = {
+  
+  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
+        email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Email dan password harus diisi");
+          throw new Error("Email and password are required");
         }
 
-        // 🔹 Cari user di database berdasarkan email
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
-        // 🔹 Cek apakah user ditemukan
-        if (!user || user.password !== credentials.password) {
-          throw new Error("Email atau password salah");
+        if (!user || !user.password) {
+          throw new Error("Invalid credentials");
         }
 
-        // 🔹 Return user dengan role untuk session
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role, // Pastikan role tersimpan di session
-        };
+        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+
+        if (!isPasswordValid) {
+          throw new Error("Invalid credentials");
+        }
+
+        return { id: user.id, name: user.name, email: user.email, role: user.role };
       },
     }),
   ],
+  session: { strategy: "jwt" },
   callbacks: {
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string; // Tambahkan role ke session
-      }
-      return session;
-    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role; // Simpan role ke token JWT
+        token.role = user.role; // 🔹 Simpan role ke JWT
       }
       return token;
     },
-  },
-  session: {
-    strategy: "jwt",
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string; // 🔹 Pastikan role ada di session
+      }
+      return session;
+    },
   },
 };

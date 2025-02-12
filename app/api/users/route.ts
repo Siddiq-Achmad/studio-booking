@@ -12,10 +12,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden: You don't have permission" }, { status: 403 });
-  }
-  
+//   if (session.user.role !== "ADMIN") {
+//     return NextResponse.json({ error: "Forbidden: You don't have permission" }, { status: 403 });
+//   }
+
   try {
     const users = await prisma.user.findMany({
       select: {

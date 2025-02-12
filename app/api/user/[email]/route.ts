@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(req: NextRequest,  context: { params: Promise<{ email: string }> } ) {
   try {
     const { email } = await context.params;
+
+    const session = await getServerSession(authOptions);
+    // Cek apakah user sudah login
+    if (!session?.user?.role) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });

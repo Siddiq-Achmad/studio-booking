@@ -18,6 +18,7 @@ const ReferralSystem = () => {
   const [referralCode, setReferralCode] = useState("");
   const [referralLink, setReferralLink] = useState("");
   const [qrCodeDataURL, setQRCodeDataURL] = useState("");
+  const [btnLoading, setBtnLoading] = useState(false);
 
   const generateReferralCode = () => {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -36,9 +37,11 @@ const ReferralSystem = () => {
   }, []);
 
   const downloadQRCode = () => {
+    setBtnLoading(true);
     if (qrCodeDataURL) {
       FileSaver.saveAs(qrCodeDataURL, "luxima-studio-referral-qr.png");
     }
+    setBtnLoading(false);
   };
 
   useEffect(() => {
@@ -89,10 +92,11 @@ const ReferralSystem = () => {
                   />
                   <Button
                     onClick={downloadQRCode}
-                    variant="outline"
+                    variant="secondary"
                     className="w-full"
+                    disabled={btnLoading}
                   >
-                    Download QR Code
+                    {btnLoading ? "Downloading..." : "Download QR Code"}
                   </Button>
                 </div>
               )}

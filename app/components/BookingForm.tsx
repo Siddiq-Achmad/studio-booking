@@ -11,8 +11,7 @@ import { format } from "date-fns";
 import { CalendarIcon, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+
 import {
   Popover,
   PopoverContent,
@@ -32,9 +31,9 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { toast } from "sonner";
 
 const BookingForm = () => {
-  const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,6 +56,22 @@ const BookingForm = () => {
     sessionType: "",
     referralCode: referralCode ?? "-",
   });
+
+  // 🔹 Fungsi untuk mengubah tanggal & tetap mempertahankan jam/menit dari bookingTime
+  const handleDateChange = (date: Date | undefined) => {
+    const time = formData.bookingTime ? formData.bookingTime : "00:00";
+    if (date) {
+      const [hours, minutes] = time.split(":").map(Number);
+      const updatedDate = new Date(date);
+      updatedDate.setHours(hours);
+      updatedDate.setMinutes(minutes);
+
+      setFormData((prev) => ({
+        ...prev,
+        bookingDate: updatedDate, // Update dengan jam dari bookingTime
+      }));
+    }
+  };
 
   // Handler untuk update bookingTime & sinkronisasi dengan bookingDate
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,10 +115,15 @@ const BookingForm = () => {
 
     const data = await response.json();
     if (!data.available) {
-      toast({
-        title: "Booking Unavailable",
+      toast.error("Booking Unavailable", {
         description: data.message,
-        variant: "destructive",
+        action: {
+          label: "Try Again",
+          onClick: () => {
+            router.push("/booking");
+          },
+        },
+        className: "destructive",
       });
       return false;
     }
@@ -116,10 +136,7 @@ const BookingForm = () => {
     setLoading(true);
 
     const isAvailable = await checkAvailability();
-    console.log(isAvailable);
-    alert(
-      "Sudah ada yang booking pada tanggal dan jam ini, Silahkan pilih tanggal dan waktu lain. Untuk memastikan booking anda, Silahkan klik Bookings Calendar untuk melihat booking yang tersedia."
-    );
+
     setLoading(false);
     if (!isAvailable) return;
 
@@ -127,9 +144,9 @@ const BookingForm = () => {
 
     // Validasi Date & Time
     if (!formData.bookingDate) {
-      toast({
-        title: "Please select a booking date.",
-        description: "Silahkan pilih tanggal dan jam booking.",
+      toast.error("Silahkan Pilih Tanggal", {
+        description:
+          "Tanggal Booking tidak boleh dibawah hari ini. Min. Booking H+1",
       });
       setLoading(false);
       return;
@@ -140,9 +157,9 @@ const BookingForm = () => {
     );
     const now = new Date();
     if (selectedDate <= now) {
-      toast({
-        title: "Please select a future date.",
-        description: "Silahkan pilih tanggal dan jam booking.",
+      toast.error("Silahkan Pilih Tanggal Booking", {
+        description:
+          "Tanggal Booking tidak boleh dibawah hari ini. Min. Booking H+1",
       });
       setLoading(false);
       return;
@@ -157,18 +174,25 @@ const BookingForm = () => {
 
       const data = await res.json();
       if (res.ok) {
-        toast({
-          title: "Booking Success",
-          description: "Silahkan klik link untuk melihat detail booking.",
+        toast.success("Booking Success", {
+          description:
+            "Silahkan klik Booking Calendar untuk memastikan waktu booking.",
+          duration: 5000,
+          action: {
+            label: "View Detail",
+            onClick: () => {
+              router.push(`/bookings`);
+            },
+          },
         });
         router.push(`/booking/success?id=${data.booking.id}`);
-        console.log(data);
+        //console.log(data);
       } else {
-        toast({ title: "Booking Failed", description: data.error });
+        toast.error("Booking Failed", { description: data.error });
       }
     } catch (error) {
       console.error("Booking error:", error);
-      toast({ title: "Booking Failed", description: "Terjadi kesalahan." });
+      toast.error("Booking Failed!!", { description: "Terjadi kesalahan." });
     }
     setIsSubmitting(false);
     setLoading(false);
@@ -256,7 +280,7 @@ const BookingForm = () => {
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant={"outline"}
+                      variant={"secondary"}
                       className={cn(
                         "w-lg justify-start text-left font-normal",
                         !formData.bookingDate && "text-muted-foreground"
@@ -275,12 +299,13 @@ const BookingForm = () => {
                       id="bookingDate"
                       mode="single"
                       selected={formData.bookingDate as Date}
-                      onSelect={(date) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          bookingDate: date,
-                        }))
-                      }
+                      // onSelect={(date) =>
+                      //   setFormData((prev) => ({
+                      //     ...prev,
+                      //     bookingDate: date,
+                      //   }))
+                      // }
+                      onSelect={handleDateChange}
                       disabled={(date) => date < new Date()}
                       initialFocus
                     />

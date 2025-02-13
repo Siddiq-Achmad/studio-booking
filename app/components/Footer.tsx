@@ -22,19 +22,9 @@ import {
   Twitter,
 } from "lucide-react";
 import Link from "next/link";
+import { Toaster } from "sonner";
 
 function Footer() {
-  const [isDarkMode, setIsDarkMode] = React.useState(true);
-  const [isChatOpen, setIsChatOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkMode]);
-
   return (
     <footer className="relative bg-background text-foreground transition-colors duration-300">
       <div className="container mx-auto px-4 py-12 md:px-6 lg:px-8">
@@ -113,11 +103,7 @@ function Footer() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-full"
-                    >
+                    <Button size="icon" className="rounded-full">
                       <Link
                         href="https://facebook.com/luxima.photo"
                         target="_blank"
@@ -135,11 +121,7 @@ function Footer() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-full"
-                    >
+                    <Button size="icon" className="rounded-full">
                       <Link href="https://x.com/luximaid" target="_blank">
                         <Twitter className="h-4 w-4" />
                         <span className="sr-only">Twitter</span>
@@ -154,11 +136,7 @@ function Footer() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-full"
-                    >
+                    <Button size="icon" className="rounded-full">
                       <Link
                         href="https://instagram.com/luxima.id"
                         target="_blank"
@@ -176,11 +154,7 @@ function Footer() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-full"
-                    >
+                    <Button size="icon" className="rounded-full">
                       <Linkedin className="h-4 w-4" />
                       <span className="sr-only">LinkedIn</span>
                     </Button>
@@ -211,6 +185,7 @@ function Footer() {
           </nav>
         </div>
       </div>
+      <Toaster position="top-right" richColors />
     </footer>
   );
 }

@@ -1,4 +1,5 @@
 import LoginForm from "@/components/LoginForm";
+import { Toaster } from "sonner";
 
 export default function LoginPage() {
   return (

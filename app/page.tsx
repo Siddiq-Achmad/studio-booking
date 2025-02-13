@@ -11,6 +11,7 @@ import AnimatedHero from "./components/AnimatedHero";
 import Image from "next/image";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import { Toaster, toast } from "sonner";
 
 export default function Home() {
   return (
@@ -93,6 +94,7 @@ export default function Home() {
           </Button>
         </section>
       </div>
+
       <Footer />
     </div>
   );

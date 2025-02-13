@@ -28,6 +28,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/AuthContext";
+import { Toaster } from "sonner";
 
 const data = {
   navMain: [
@@ -176,6 +177,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>
+      <Toaster position="top-right" richColors />
     </Sidebar>
   );
 }

@@ -25,19 +25,37 @@ export default function LoginForm() {
     e.preventDefault();
     setLoading(true);
 
-    const res = await signIn("credentials", {
-      email: formData.email,
-      password: formData.password,
-      redirect: false,
-    });
+    try {
+      const res = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+        callbackUrl: "/dashboard",
+      });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (res?.error) {
-      toast.error("Login gagal. Periksa email dan password.");
-    } else {
-      toast.success("Login berhasil!");
-      router.push("/dashboard");
+      if (res?.ok) {
+        toast.success("Login Success!", {
+          description: `Welcome back, ${formData.email}!`,
+        });
+        setTimeout(() => {
+          window.location.href = "/dashboard"; // Redirect ke dashboard setelah login
+        }, 1500);
+      } else {
+        throw new Error(res?.error ? res.error : "Login Failed!");
+      }
+    } catch (error: any) {
+      toast.error("Login Failed!", {
+        description: error.message,
+        action: {
+          label: "Try Again",
+          onClick: () => console.log("User mencoba login lagi"),
+        },
+        className: "destructive", // Menggunakan gaya error
+      });
+    } finally {
+      setLoading(false);
     }
   };
 

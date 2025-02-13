@@ -57,18 +57,6 @@ type Item = {
   link: string;
 };
 
-type Booking = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  bookingDate: string;
-  bookingTime: string;
-  sessionType: string;
-  referralCode?: string;
-  status: Array<"PAID" | "HALFPAID" | "UNPAID" | "CANCELED">;
-};
-
 const columns: ColumnDef<Item>[] = [
   {
     id: "select",

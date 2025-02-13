@@ -57,6 +57,18 @@ type Item = {
   link: string;
 };
 
+type Booking = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  bookingDate: string;
+  bookingTime: string;
+  sessionType: string;
+  referralCode?: string;
+  status: Array<"PAID" | "HALFPAID" | "UNPAID" | "CANCELED">;
+};
+
 const columns: ColumnDef<Item>[] = [
   {
     id: "select",
@@ -280,7 +292,7 @@ function TableData() {
   });
 
   return (
-    <div>
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6 text-center">Table Data</h1>
       <div className="space-y-6 ">
         {/* Filters */}

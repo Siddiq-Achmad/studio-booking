@@ -22,11 +22,22 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import moment from "moment";
-import { LogOut } from "lucide-react";
+import { LogOut, MoveDownLeft, MoveUpRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import TableData from "@/app/components/TableData";
 import TableUser from "@/app/components/TableUser";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import LogoutButton from "@/components/LogoutButton";
+import TableBooking from "@/app/components/TableBooking";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -70,19 +81,45 @@ export default function DashboardPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-4 px-4">
-            <Avatar>
-              <AvatarImage src={user?.image} alt={user?.name} />
-              <AvatarFallback className="rounded-full">CN</AvatarFallback>
-            </Avatar>
             <p>{session?.user?.name}</p>
-            <Button onClick={() => signOut({ callbackUrl: "/login" })}>
-              <LogOut size={18} /> Logout
-            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  aria-label="Open account menu"
+                >
+                  <Avatar>
+                    <AvatarImage src={user?.image} alt={user?.name} />
+                    <AvatarFallback className="rounded-full">CN</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="max-w-64">
+                <DropdownMenuLabel className="flex flex-col">
+                  <span>Signed in as</span>
+                  <span className="text-xs font-normal text-foreground">
+                    {user?.email}
+                  </span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>Option 1</DropdownMenuItem>
+                  <DropdownMenuItem>Option 2</DropdownMenuItem>
+                  <DropdownMenuItem>Option 3</DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <LogoutButton />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <Card className="bg-neutral-100/50 aspect-video rounded-xl">
+            <Card className="bg-neutral-100/50 rounded-xl">
               <CardHeader>
                 <CardTitle>Dashboard</CardTitle>
               </CardHeader>
@@ -101,12 +138,70 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <div className="bg-neutral-100/50 aspect-video rounded-xl " />
-            <div className="bg-neutral-100/50 aspect-video rounded-xl " />
+            <div className=" col-span-2 rounded-xl ">
+              <div className="w-full">
+                <div className="flex justify-center items-center">
+                  <div className="grid text-left grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 w-full gap-2">
+                    <div className="flex gap-0 flex-col justify-between p-6 border rounded-md">
+                      <MoveUpRight className="w-4 h-4 mb-10 text-primary" />
+                      <h2 className="text-4xl tracking-tighter max-w-xl text-left font-regular flex flex-row gap-4 items-end">
+                        500.000
+                        <span className="text-muted-foreground text-sm tracking-normal">
+                          +20.1%
+                        </span>
+                      </h2>
+                      <p className="text-base leading-relaxed tracking-tight text-muted-foreground max-w-xl text-left">
+                        Monthly active users
+                      </p>
+                    </div>
+                    <div className="flex gap-0 flex-col justify-between p-6 border rounded-md">
+                      <MoveDownLeft className="w-4 h-4 mb-10 text-destructive" />
+                      <h2 className="text-4xl tracking-tighter max-w-xl text-left font-regular flex flex-row gap-4 items-end">
+                        20.105
+                        <span className="text-muted-foreground text-sm tracking-normal">
+                          -2%
+                        </span>
+                      </h2>
+                      <p className="text-base leading-relaxed tracking-tight text-muted-foreground max-w-xl text-left">
+                        Daily active users
+                      </p>
+                    </div>
+                    <div className="flex gap-0 flex-col justify-between p-6 border rounded-md">
+                      <MoveUpRight className="w-4 h-4 mb-10 text-primary" />
+                      <h2 className="text-4xl tracking-tighter max-w-xl text-left font-regular flex flex-row gap-4 items-end">
+                        $523.520
+                        <span className="text-muted-foreground text-sm tracking-normal">
+                          +8%
+                        </span>
+                      </h2>
+                      <p className="text-base leading-relaxed tracking-tight text-muted-foreground max-w-xl text-left">
+                        Monthly recurring revenue
+                      </p>
+                    </div>
+                    <div className="flex gap-0 flex-col justify-between p-6 border rounded-md">
+                      <MoveUpRight className="w-4 h-4 mb-10 text-primary" />
+                      <h2 className="text-4xl tracking-tighter max-w-xl text-left font-regular flex flex-row gap-4 items-end">
+                        $1052
+                        <span className="text-muted-foreground text-sm tracking-normal">
+                          +2%
+                        </span>
+                      </h2>
+                      <p className="text-base leading-relaxed tracking-tight text-muted-foreground max-w-xl text-left">
+                        Cost per acquisition
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div className="bg-neutral-100/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min p-4 ">
             <TableUser />
-            <Separator className="my-4" />
+          </div>
+          <div className="bg-neutral-100/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min p-4 ">
+            <TableBooking />
+          </div>
+          <div className="bg-neutral-100/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min p-4 ">
             <TableData />
           </div>
         </div>

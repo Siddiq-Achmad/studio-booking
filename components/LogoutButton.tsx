@@ -8,7 +8,6 @@ import { toast } from "sonner";
 export default function LogoutButton() {
   return (
     <Button
-      variant="outline"
       className="flex items-center gap-2 w-full"
       onClick={() =>
         signOut({ callbackUrl: "/login" })

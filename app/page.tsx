@@ -31,7 +31,7 @@ export default function Home() {
         <section className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
           <div className="relative h-96">
             <Image
-              src="https://luxima.id/images/SQA03332.jpg"
+              src="/images/SQA03332.jpg"
               alt="Studio sample"
               fill
               className="object-cover rounded-lg shadow-lg w-full h-full"

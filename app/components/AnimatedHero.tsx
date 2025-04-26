@@ -21,7 +21,7 @@ const AnimatedHero = () => {
         transition={{ duration: 1 }}
       >
         <motion.div
-          className="absolute inset-0 bg-[url('https://luxima.id/images/BG.jpg')] bg-cover bg-center rounded-4xl"
+          className="absolute inset-0 bg-[url('/images/BG.jpg')] bg-cover bg-center rounded-4xl"
           initial={{ scale: 1.2 }}
           animate={{ scale: 1 }}
           transition={{ duration: 10 }}

@@ -81,24 +81,27 @@ export default function DashboardPage() {
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-4 px-4">
-            <p>{session?.user?.name}</p>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  size="icon"
-                  variant="outline"
+                  size="lg"
+                  variant="ghost"
                   aria-label="Open account menu"
+                  className="w-fit h-fit flex justify-between items-center gap-4"
                 >
+                  <div className="grid flex-1 text-right text-sm leading-tight">
+                    <span className="truncate font-normal">{user?.name}</span>
+                    <span className="truncate text-xs">{user?.email}</span>
+                  </div>
                   <Avatar>
                     <AvatarImage src={user?.image} alt={user?.name} />
-                    <AvatarFallback className="rounded-full">CN</AvatarFallback>
+                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="max-w-64">
-                <DropdownMenuLabel className="flex flex-col">
-                  <span>Signed in as</span>
+                <DropdownMenuLabel className="flex flex-col ">
+                  <span>{user?.name}</span>
                   <span className="text-xs font-normal text-foreground">
                     {user?.email}
                   </span>

@@ -65,7 +65,7 @@ const ReferralSystem = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button onClick={generateReferralCode} className="w-full mb-4">
+          <Button onClick={generateReferralCode} className="mb-4">
             Generate Referral Code
           </Button>
           {referralCode && (
@@ -93,8 +93,8 @@ const ReferralSystem = () => {
                   <Button
                     onClick={downloadQRCode}
                     variant="secondary"
-                    className="w-full"
                     disabled={btnLoading}
+                    className="mb-4"
                   >
                     {btnLoading ? "Downloading..." : "Download QR Code"}
                   </Button>
